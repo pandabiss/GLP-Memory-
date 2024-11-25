@@ -10,7 +10,6 @@
         text-align: center;
         margin: 0;
         padding: 0;
-        overflow: hidden;
         background-image: url("hintergrundbild.jpg");
         background-size: cover;
         background-repeat: no-repeat;
@@ -39,11 +38,11 @@
         border-radius: 15px;
         padding: 10px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
     }
 
     .card {
         width: 100%;
+        max-width: 100px;
         aspect-ratio: 1;
         border-radius: 10px;
         overflow: hidden;
@@ -111,11 +110,20 @@
     footer a:hover {
         text-decoration: underline;
     }
+
+    #game-over-message {
+        display: none;
+        font-size: 2em;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <h1>GLP Memory</h1>
   <div id="game-board"></div>
+  <div id="game-over-message">🎉 Herzlichen Glückwunsch! 🎉</div>
   <footer>
     © 2024 Grünliberale Kanton Solothurn und Roland Goetschi
     <a href="https://so.grunliberale.ch" target="_blank">Zur Webseite</a>
@@ -130,9 +138,9 @@
     const flipSound = document.getElementById("flipSound");
     const matchSound = document.getElementById("matchSound");
 
-    // Spiel starten und Startsound abspielen
+    // Startsound abspielen, wenn die Seite geladen wird
     window.addEventListener("load", () => {
-        startSound.volume = 0.5;
+        startSound.volume = 0.5; // Lautstärke optional
         startSound.play();
     });
 
@@ -178,15 +186,17 @@
 
     let flippedCards = [];
     let matchedPairs = 0;
+    let isChecking = false;
 
     function flipCard(cardElement, card) {
-        if (flippedCards.length < 2 && !cardElement.classList.contains("flipped")) {
+        if (flippedCards.length < 2 && !cardElement.classList.contains("flipped") && !isChecking) {
             cardElement.classList.add("flipped");
             flipSound.currentTime = 0;
             flipSound.play();
             flippedCards.push({ element: cardElement, id: card.id });
 
             if (flippedCards.length === 2) {
+                isChecking = true;
                 checkMatch();
             }
         }
@@ -201,12 +211,20 @@
             matchedPairs++;
 
             if (matchedPairs === images.length) {
-                alert("Herzlichen Glückwunsch! Du hast das Spiel beendet.");
+                // Spielende: Startsound stoppen
+                startSound.pause();
+                startSound.currentTime = 0;
+
+                // Visuelle Anzeige bei Spielende
+                document.getElementById("game-over-message").style.display = "block";
             }
+
+            isChecking = false;
         } else {
             setTimeout(() => {
                 card1.element.classList.remove("flipped");
                 card2.element.classList.remove("flipped");
+                isChecking = false;
             }, 1000);
         }
         flippedCards = [];
