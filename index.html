@@ -29,20 +29,22 @@
 
     #game-board {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Flexible Spalten */
-        grid-gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Flexibles Layout */
+        grid-gap: 5px;
         justify-content: center;
-        margin: 20px auto;
-        width: 95vw; /* Passt sich der Bildschirmbreite an */
-        max-width: 600px;
+        margin: 10px auto;
+        width: 95vw; /* Passt sich dem Bildschirm an */
+        max-width: 500px;
         background: rgba(0, 0, 0, 0.5);
         border-radius: 15px;
         padding: 10px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
     }
 
     .card {
-        aspect-ratio: 1;
+        width: 100%;
+        aspect-ratio: 1; /* Quadratische Karten */
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
@@ -189,6 +191,17 @@
         }
         flippedCards = [];
     }
+
+    // Dynamische Anpassung des Spielfelds
+    function adjustGameBoard() {
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const cardSize = Math.min(screenWidth, screenHeight) / 5; // Maximal 5 Karten pro Reihe
+        board.style.gridTemplateColumns = `repeat(auto-fit, minmax(${cardSize}px, 1fr))`;
+    }
+
+    window.addEventListener("resize", adjustGameBoard);
+    window.addEventListener("load", adjustGameBoard);
   </script>
 </body>
 </html>
