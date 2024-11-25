@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLP Memory-Spiel</title>
+  <style>
+    /* Hintergrundbild */
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-image: url("hintergrundbild.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
+    }
+
+    /* Titel */
+    h1 {
+      color: #fff;
+      font-size: 3em;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      margin: 20px 0;
+      letter-spacing: 2px;
+    }
+
+    /* Spielfeld */
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      grid-gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
+      width: 90vw;
+      max-width: 600px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+      padding: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Karten */
+    .card {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 10px;
+    }
+
+    /* Bilder auf den Karten */
+    .card-front img,
+    .card-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .card-front {
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #00796b;
+    }
+
+    .card-back {
+      background-color: white;
+      transform: rotateY(180deg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Gelbes Leuchten */
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(255, 255, 0, 1);
+      }
+      100% {
+        box-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+      }
+    }
+
+    .matched {
+      animation: glow 1s ease-in-out;
+    }
+
+    /* Footer */
+    footer {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9em;
+      color: white;
+      z-index: 10; /* Überlagert andere Inhalte */
+    }
+
+    footer img {
+      width: 30px;
+      height: auto;
+    }
+
+    footer a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>GLP Memory</h1>
+  <div id="game-board"></div>
+
+  <!-- Footer mit Copyright und Link -->
+  <footer>
+    <span>© 2024 Grünliberale Kanton Solothurn und Roland Goetschi</span>
+    <a href="https://so.grunliberale.ch" target="_blank">
+      <img src="glp_logo.png" alt="GLP Logo">
+      Webseite besuchen
+    </a>
+  </footer>
+
+  <audio id="startSound" src="intro.mp3" loop></audio>
+  <audio id="flipSound" src="flip.mp3"></audio>
+  <audio id="matchSound" src="match.mp3"></audio>
+  <audio id="endSound" src="butterflies.mp3"></audio>
+
+  <script>
+    const startSound = document.getElementById("startSound");
+    const flipSound = document.getElementById("flipSound");
+    const matchSound = document.getElementById("matchSound");
+    const endSound = document.getElementById("endSound");
+
+    let gameStarted = false;
+
+    document.body.addEventListener("click", () => {
+      if (!gameStarted) {
+        startSound.volume = 0.2;
+        startSound.play();
+        gameStarted = true;
+      }
+    });
+
+    const images = [
+      "image1.jpg", "image2.jpg", "image3.jpg", "image4.jpg", "image5.jpg",
+      "image6.jpg", "image7.jpg", "image8.jpg", "image9.jpg", "image10.jpg"
+    ];
+
+    const board = document.getElementById("game-board");
+    let cards = [];
+
+    images.forEach(image => {
+      cards.push({ id: image, img: image });
+      cards.push({ id: image, img: image });
+    });
+
+    cards = cards.sort(() => Math.random() - 0.5);
+
+    cards.forEach(card => {
+      const cardElement = document.createElement("div");
+      cardElement.classList.add("card");
+      cardElement.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">
+            <img src="glp_logo.png" alt="GLP Logo">
+          </div>
+          <div class="card-back">
+            <img src="${card.img}" alt="Bild">
+          </div>
+        </div>`;
+      board.appendChild(cardElement);
+
+      cardElement.addEventListener("click", () => flipCard(cardElement, card));
+    });
+
+    let flippedCards = [];
+    let matchedPairs = 0;
+
+    function flipCard(cardElement, card) {
+      if (flippedCards.length < 2 && !cardElement.classList.contains("flipped")) {
+        cardElement.classList.add("flipped");
+        flipSound.currentTime = 0;
+        flipSound.play();
+        flippedCards.push({ element: cardElement, id: card.id });
+
+        if (flippedCards.length === 2) {
+          checkMatch();
+        }
+      }
+    }
+
+    function checkMatch() {
+      const [card1, card2] = flippedCards;
+
+      if (card1.id === card2.id) {
+        matchedPairs++;
+        matchSound.currentTime = 0;
+        matchSound.play();
+        card1.element.classList.add("matched");
+        card2.element.classList.add("matched");
+
+        if (matchedPairs === images.length) {
+          endSound.play();
+        }
+      } else {
+        setTimeout(() => {
+          card1.element.classList.remove("flipped");
+          card2.element.classList.remove("flipped");
+        }, 1000);
+      }
+      flippedCards = [];
+    }
+  </script>
+</body>
+</html>
