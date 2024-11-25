@@ -29,11 +29,11 @@
 
     #game-board {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Flexibles Layout */
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
         grid-gap: 5px;
         justify-content: center;
         margin: 10px auto;
-        width: 95vw; /* Passt sich dem Bildschirm an */
+        width: 95vw;
         max-width: 500px;
         background: rgba(0, 0, 0, 0.5);
         border-radius: 15px;
@@ -44,7 +44,7 @@
 
     .card {
         width: 100%;
-        aspect-ratio: 1; /* Quadratische Karten */
+        aspect-ratio: 1;
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
@@ -120,7 +120,22 @@
     © 2024 Grünliberale Kanton Solothurn und Roland Goetschi
     <a href="https://so.grunliberale.ch" target="_blank">Zur Webseite</a>
   </footer>
+
+  <audio id="startSound" src="intro.mp3" loop></audio>
+  <audio id="flipSound" src="flip.mp3"></audio>
+  <audio id="matchSound" src="match.mp3"></audio>
+
   <script>
+    const startSound = document.getElementById("startSound");
+    const flipSound = document.getElementById("flipSound");
+    const matchSound = document.getElementById("matchSound");
+
+    // Spiel starten und Startsound abspielen
+    window.addEventListener("load", () => {
+        startSound.volume = 0.5;
+        startSound.play();
+    });
+
     const images = [
         "image1.jpg", "image2.jpg", "image3.jpg", "image4.jpg", "image5.jpg",
         "image6.jpg", "image7.jpg", "image8.jpg", "image9.jpg", "image10.jpg"
@@ -167,6 +182,8 @@
     function flipCard(cardElement, card) {
         if (flippedCards.length < 2 && !cardElement.classList.contains("flipped")) {
             cardElement.classList.add("flipped");
+            flipSound.currentTime = 0;
+            flipSound.play();
             flippedCards.push({ element: cardElement, id: card.id });
 
             if (flippedCards.length === 2) {
@@ -179,7 +196,10 @@
         const [card1, card2] = flippedCards;
 
         if (card1.id === card2.id) {
+            matchSound.currentTime = 0;
+            matchSound.play();
             matchedPairs++;
+
             if (matchedPairs === images.length) {
                 alert("Herzlichen Glückwunsch! Du hast das Spiel beendet.");
             }
@@ -192,11 +212,10 @@
         flippedCards = [];
     }
 
-    // Dynamische Anpassung des Spielfelds
     function adjustGameBoard() {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        const cardSize = Math.min(screenWidth, screenHeight) / 5; // Maximal 5 Karten pro Reihe
+        const cardSize = Math.min(screenWidth, screenHeight) / 5;
         board.style.gridTemplateColumns = `repeat(auto-fit, minmax(${cardSize}px, 1fr))`;
     }
 
