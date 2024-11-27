@@ -82,23 +82,30 @@
         transform: rotateY(180deg);
     }
 
-    /* Kopfzeile und Fußzeile */
-    header {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    header a {
-        color: white;
-        text-decoration: none;
-        font-size: 1.2em;
-    }
-
-    footer {
-        text-align: center;
+    /* Buttons am Spielende */
+    .end-buttons {
         margin-top: 20px;
-        font-size: 0.9em;
-        color: white;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .end-buttons a, .end-buttons button {
+        padding: 10px 20px;
+        font-size: 1.2em;
+        background-color: yellow;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.3s;
+    }
+
+    .end-buttons a:hover, .end-buttons button:hover {
+        background-color: gold;
     }
   </style>
 </head>
@@ -108,7 +115,13 @@
     <h1>GLP Memory-Spiel</h1>
   </header>
   <div id="game-board"></div>
-  <div id="game-over-message" style="display: none;">🎉 Herzlichen Glückwunsch! 🎉</div>
+  <div id="game-over-message" style="display: none;">
+    🎉 Herzlichen Glückwunsch! 🎉
+    <div class="end-buttons">
+      <button onclick="restartGame()">Neustart</button>
+      <a href="https://so.grunliberale.ch" target="_blank">Mehr über die GLP erfahren</a>
+    </div>
+  </div>
   <footer>
     <p>© 2024 Grünliberale Kanton Solothurn und Roland Goetschi</p>
   </footer>
@@ -204,10 +217,6 @@
             card2.element.classList.add("matched");
             matchedPairs++;
 
-            // Leuchteffekt aktivieren
-            card1.element.querySelector(".card-inner").style.animation = "glow 1s linear";
-            card2.element.querySelector(".card-inner").style.animation = "glow 1s linear";
-
             if (matchedPairs === images.length) {
                 startSound.pause();
                 startSound.currentTime = 0;
@@ -233,9 +242,13 @@
         board.style.gridTemplateColumns = `repeat(auto-fit, minmax(${cardSize}px, 1fr))`;
     }
 
+    // Neustart des Spiels
+    function restartGame() {
+        location.reload();
+    }
+
     window.addEventListener("resize", adjustGameBoard);
     window.addEventListener("load", adjustGameBoard);
   </script>
 </body>
 </html>
-
