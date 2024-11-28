@@ -97,3 +97,11 @@ footer {
 .end-buttons a:hover {
     background-color: #005bb5; /* Dunkleres Blau bei Hover */
 }
+
+@media (max-width: 600px) {
+    .play-button {
+        font-size: 1.2em;
+        padding: 10px 20px;
+        bottom: 15%; /* Button etwas höher auf kleinen Bildschirmen */
+    }
+}
