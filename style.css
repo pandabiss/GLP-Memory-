@@ -30,7 +30,10 @@ main {
 }
 
 .play-button {
-    display: inline-block;
+    position: fixed; /* Button bleibt an einer festen Position */
+    bottom: 20%; /* Abstand vom unteren Bildschirmrand */
+    left: 50%; /* Horizontal zentrieren */
+    transform: translateX(-50%); /* Exakte Zentrierung */
     padding: 15px 30px;
     font-size: 1.5em;
     background-color: yellow;
